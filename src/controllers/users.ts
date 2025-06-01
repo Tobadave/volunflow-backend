@@ -7,7 +7,7 @@ import client from "../db/connect";
 import userSchema from "../models/user";
 import paginate from "../utils/pagination";
 import generate_token from "../utils/generate_token";
-import { sendApprovalEmail, sendNotificationEmail } from "../utils/mail_send";
+import { sendApprovalEmail,sendDisapprovalEmail, sendNotificationEmail } from "../utils/mail_send";
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
@@ -120,11 +120,17 @@ export const updateUser = async (req: Request, res: Response) => {
     if (req.body.approved) {
       const user = await client
         .collection("users")
-        .findOne(
-          { _id: new ObjectId(documentId) }
-        );
+        .findOne({ _id: new ObjectId(documentId) });
 
       sendApprovalEmail(user.email);
+    }
+
+    if (req.body.approved == false) {
+      const user = await client
+        .collection("users")
+        .findOne({ _id: new ObjectId(documentId) });
+
+            if (user.type == "organizer" && !req.body.role) sendDisapprovalEmail(user.email);
     }
 
     res.status(200).send({

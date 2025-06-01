@@ -52,6 +52,33 @@ export const sendApprovalEmail = async (email: string): Promise<void> => {
   }
 };
 
+
+export const sendDisapprovalEmail = async (email: string): Promise<void> => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.SMTP_USERNAME,
+      pass: process.env.SMTP_APP_PASSWORD,
+    },
+    // debug: true, // Enable debugging
+    // logger: true
+  });
+
+  const mailOptions = {
+    from: "no-reply@volunflow.com",
+    to: email,
+    subject: "Registration Rejected",
+    text: "Your registration for your organizer account has been rejected, For any form of redress use the Feedback Chanel",
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending disapproval email:", error);
+  }
+};
+
+
 export const sendNotificationEmail = async (email: string, notification: { title: string, desc: string }): Promise<void> => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
